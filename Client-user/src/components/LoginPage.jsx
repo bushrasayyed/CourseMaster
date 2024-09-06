@@ -27,9 +27,9 @@ function LoginPage() {
       setIsLoading(true); // Set loading to true before making the request
 
       const res = await axios.post(
-        "http://localhost:3000/users/login",
+        "http://localhost:5000/api/student/login",
         {
-          username: user.email,
+          email: user.email,
           password: user.password,
         }
       );
