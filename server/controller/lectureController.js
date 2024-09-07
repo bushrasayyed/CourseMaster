@@ -32,6 +32,7 @@ exports.getLecturesByCourseId = async (req, res) => {
 
   try {
     const lectures = await Lecture.find({ course_id: courseId }).sort({ order: 1 });
+    console.log("Response",lectures)
     res.status(200).json(lectures);
   } catch (error) {
     console.error("Failed to get lectures:", error);

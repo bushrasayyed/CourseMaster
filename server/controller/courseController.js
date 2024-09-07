@@ -4,18 +4,19 @@ const fs = require("fs");
 
 // Create a new course with image upload
 exports.createCourse = async (req, res) => {
-  const { title, description } = req.body;
+  const { title, description,price } = req.body;
   let imageLink = null;
 
   // Handle file upload
   if (req.file) {
-    imageLink = req.file.path; // Save the image path in the database
+    imageLink = path.basename(req.file.path);// Save the image path in the database
   }
 
   try {
     const newCourse = new Course({
       title,
       description,
+      price,
       imageLink, // Store the image file path in the database
     });
 
@@ -29,14 +30,26 @@ exports.createCourse = async (req, res) => {
 
 // Get all courses
 exports.getAllCourses = async (req, res) => {
-    try {
-      const courses = await Course.find(); // Get all courses
-      res.status(200).json(courses);
-    } catch (error) {
-      console.error("Error:", error.message);
-      res.status(500).json({ error: "Internal server error" });
-    }
-  };
+  try {
+    let courses = await Course.find();
+
+    // Adjust the imageLink to include the server's base URL
+    courses = courses.map(course => ({
+      ...course._doc,
+      imageLink: `http://localhost:5000/${course.imageLink.replace(/\\/g, "/")}` // Correct slashes
+    }));
+    
+    // console.log("Response:", courses);
+
+    res.status(200).json(courses); // Return the updated courses array
+  } catch (error) {
+    console.error("Error:", error.message);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+
+
   
   // Get course by ID
   exports.getCourseById = async (req, res) => {
