@@ -35,21 +35,26 @@ function Signin() {
         }
       );
       const data = res.data;
-      console.log("Data",data)
-
+      console.log("Data", data);
+  
+      // Save token and email in localStorage
       localStorage.setItem("token", data.token);
+      localStorage.setItem("userEmail", email);
+  
       setUser({
-        email: email,
+        email: data.email,
         isLoading: false,
       });
+  
       // Redirect to dashboard after login
-      navigate("/courses");
+      navigate("/dashboard");
     } catch (error) {
       console.error("Error during signin:", error);
     } finally {
       setLoading(false); // Reset loading state after signin, whether success or error
     }
   };
+  
 
   return (
     <div>
