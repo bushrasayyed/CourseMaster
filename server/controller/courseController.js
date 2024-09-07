@@ -34,19 +34,22 @@ exports.getAllCourses = async (req, res) => {
     let courses = await Course.find();
 
     // Adjust the imageLink to include the server's base URL
-    courses = courses.map(course => ({
-      ...course._doc,
-      imageLink: `http://localhost:5000/${course.imageLink.replace(/\\/g, "/")}` // Correct slashes
-    }));
+    courses = courses.map(course => {
+      // Check if imageLink is not null or undefined
+      const imageLink = course.imageLink ? `http://localhost:5000/${course.imageLink.replace(/\\/g, "/")}` : null;
+      return {
+        ...course._doc,
+        imageLink
+      };
+    });
     
-    // console.log("Response:", courses);
-
     res.status(200).json(courses); // Return the updated courses array
   } catch (error) {
     console.error("Error:", error.message);
     res.status(500).json({ error: "Internal server error" });
   }
 };
+
 
 
 
