@@ -94,7 +94,7 @@ import { RecoilRoot } from "recoil";
 import "./components/LandingPage.css";
 import backgroundImg from "../public/Background.svg";
 import Layout from "./components/Layout";
-import { Dashboard } from "@mui/icons-material";
+import Dashboard from "./components/Dashboard";
 
 function App() {
   return (
@@ -111,13 +111,13 @@ function App() {
         }}
       >
         <Router>
-          <Appbar />
+      
           <Routes>
             <Route path="/" element={<Landing />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/courses" element={<Courses />} />
-            <Route path="/course-details/:courseId" element={<CourseDetails />} />
-            <Route path="/addcourse" element={<Addcourse />} />
+            <Route path="/dashboard" element={<Layout><Dashboard /></Layout>} />
+            <Route path="/courses" element={<Layout><Courses /></Layout>} />
+            <Route path="/course-details/:courseId" element={<Layout><CourseDetails /></Layout>} />
+            <Route path="/addcourse" element={<Layout><Addcourse /></Layout>} />
             <Route path="/signin" element={<Signin />} />
             <Route path="/signup" element={<Signup />} />
           </Routes>

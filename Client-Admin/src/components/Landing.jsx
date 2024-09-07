@@ -42,7 +42,7 @@ function Landing() {
               A place where you streamline course management
               </Typography>
             </motion.div>
-            {!userLoading && !userEmail && (
+          
               <motion.div
                 initial="hidden"
                 whileInView="visible"
@@ -76,7 +76,7 @@ function Landing() {
                   </div>
                 </div>
               </motion.div>
-            )}
+    
           </div>
         </Grid>
         <Grid item xs={12} md={6} lg={6} style={{ marginTop: 20 }}>

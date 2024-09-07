@@ -8,7 +8,7 @@ import {
   Box,
   TextField,
 } from "@mui/material";
-import { Edit, Delete, Add,Visibility  } from "@mui/icons-material";
+import { Edit, Delete, Add, Visibility } from "@mui/icons-material";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -29,6 +29,7 @@ function Courses() {
   const [courses, setCourses] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
+  const [openAdd, setOpenAdd] = useState(false);
   const [openAddLecture, setOpenAddLecture] = useState(false);
   const [editingCourse, setEditingCourse] = useState(null);
   const [formData, setFormData] = useState({ title: '', description: '', image: null });
@@ -66,6 +67,19 @@ function Courses() {
     setOpenEdit(true);
   };
 
+  const handleAddClick = async() => {
+    try {
+      setFormData({ title: '', description: '', image: null });
+      setOpenAdd(true);
+      await axios.post('http://localhost:5000/api/courses', newCourse);
+      // Fetch courses again to update the list
+      fetchCourses();
+    } catch (error) {
+      console.error('Error adding course:', error);
+    }
+   
+  };
+
   const handleAddLectureClick = (course) => {
     setEditingCourse(course);
     setLectureData({ title: '', videoUrl: '', order: '' });
@@ -73,6 +87,7 @@ function Courses() {
   };
 
   const handleCloseEdit = () => setOpenEdit(false);
+  const handleCloseAdd = () => setOpenAdd(false);
   const handleCloseAddLecture = () => setOpenAddLecture(false);
 
   const handleFormChange = (e) => {
@@ -108,12 +123,21 @@ function Courses() {
     }
 
     try {
-      await axios.put(`http://localhost:5000/api/updateCourse/${editingCourse._id}`, form, {
-        headers: {
-          'Authorization': 'Bearer ' + localStorage.getItem("token"),
-          'Content-Type': 'multipart/form-data'
-        }
-      });
+      if (editingCourse) {
+        await axios.put(`http://localhost:5000/api/updateCourse/${editingCourse._id}`, form, {
+          headers: {
+            'Authorization': 'Bearer ' + localStorage.getItem("token"),
+            'Content-Type': 'multipart/form-data'
+          }
+        });
+      } else {
+        await axios.post("http://localhost:5000/api/addcourse", form, {
+          headers: {
+            'Authorization': 'Bearer ' + localStorage.getItem("token"),
+            'Content-Type': 'multipart/form-data'
+          }
+        });
+      }
       // Refresh course data
       const response = await axios.get("http://localhost:5000/api/getAllCourses", {
         headers: {
@@ -121,9 +145,10 @@ function Courses() {
         },
       });
       setCourses(response.data);
+      handleCloseAdd();
       handleCloseEdit();
     } catch (error) {
-      console.error("Error updating course:", error);
+      console.error("Error submitting form:", error);
     }
   };
 
@@ -155,20 +180,36 @@ function Courses() {
   };
 
   const handleDelete = async (id) => {
-    try {
-      await axios.delete(`http://localhost:5000/api/deleteCourse/${id}`, {
-        headers: {
-          Authorization: "Bearer " + localStorage.getItem("token"),
-        },
-      });
-      setCourses(courses.filter((course) => course._id !== id));
-    } catch (error) {
-      console.error("Error deleting course:", error);
+    // Show confirmation dialog
+    const isConfirmed = window.confirm("Are you sure you want to delete this course?");
+    
+    if (isConfirmed) {
+      try {
+        await axios.delete(`http://localhost:5000/api/deleteCourse/${id}`, {
+          headers: {
+            Authorization: "Bearer " + localStorage.getItem("token"),
+          },
+        });
+        setCourses(courses.filter((course) => course._id !== id));
+      } catch (error) {
+        console.error("Error deleting course:", error);
+      }
     }
   };
+  
 
   return (
     <div style={{ height: "100vh" }}>
+      <Button
+        variant="contained"
+        color="secondary"
+        startIcon={<Add />}
+        size="small"
+        style={{ minWidth: "32px", height: "45px", margin: "0 5px" }}
+        onClick={handleAddClick}
+      >
+        Add Course
+      </Button>
       <Typography
         variant="h4"
         style={{
@@ -183,6 +224,7 @@ function Courses() {
       >
         All Courses
       </Typography>
+
       <div
         style={{ display: "flex", flexWrap: "wrap", justifyContent: "center" }}
       >
@@ -203,37 +245,85 @@ function Courses() {
         aria-describedby="edit-course-modal-description"
       >
         <Box sx={modalStyle}>
-          <Typography variant="h6" component="h2">
+          <Typography id="edit-course-modal-title" variant="h6" component="h2">
             Edit Course
           </Typography>
           <form onSubmit={handleSubmit}>
             <TextField
               label="Title"
+              variant="outlined"
+              fullWidth
+              margin="normal"
               name="title"
               value={formData.title}
               onChange={handleFormChange}
-              fullWidth
-              margin="normal"
+              required
             />
             <TextField
               label="Description"
+              variant="outlined"
+              fullWidth
+              margin="normal"
               name="description"
               value={formData.description}
               onChange={handleFormChange}
-              fullWidth
-              margin="normal"
+              required
             />
             <input
               type="file"
               accept="image/*"
               onChange={handleImageChange}
             />
-            <Button type="submit" variant="contained" color="primary" style={{ marginTop: '16px' }}>
-              Save Changes
+            <Button type="submit" variant="contained" color="primary" style={{ marginTop: "10px" }}>
+              Submit
             </Button>
           </form>
         </Box>
       </Modal>
+
+      <Modal
+        open={openAdd}
+        onClose={handleCloseAdd}
+        aria-labelledby="add-course-modal"
+        aria-describedby="add-course-modal-description"
+      >
+        <Box sx={modalStyle}>
+          <Typography id="add-course-modal-title" variant="h6" component="h2">
+            Add Course
+          </Typography>
+          <form onSubmit={handleSubmit}>
+            <TextField
+              label="Title"
+              variant="outlined"
+              fullWidth
+              margin="normal"
+              name="title"
+              value={formData.title}
+              onChange={handleFormChange}
+              required
+            />
+            <TextField
+              label="Description"
+              variant="outlined"
+              fullWidth
+              margin="normal"
+              name="description"
+              value={formData.description}
+              onChange={handleFormChange}
+              required
+            />
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleImageChange}
+            />
+            <Button type="submit" variant="contained" color="primary" style={{ marginTop: "10px" }}>
+              Submit
+            </Button>
+          </form>
+        </Box>
+      </Modal>
+
       <Modal
         open={openAddLecture}
         onClose={handleCloseAddLecture}
@@ -241,36 +331,43 @@ function Courses() {
         aria-describedby="add-lecture-modal-description"
       >
         <Box sx={modalStyle}>
-          <Typography variant="h6" component="h2">
+          <Typography id="add-lecture-modal-title" variant="h6" component="h2">
             Add Lecture
           </Typography>
           <form onSubmit={handleAddLectureSubmit}>
             <TextField
               label="Title"
+              variant="outlined"
+              fullWidth
+              margin="normal"
               name="title"
               value={lectureData.title}
               onChange={handleLectureChange}
-              fullWidth
-              margin="normal"
+              required
             />
             <TextField
               label="Video URL"
+              variant="outlined"
+              fullWidth
+              margin="normal"
               name="videoUrl"
               value={lectureData.videoUrl}
               onChange={handleLectureChange}
-              fullWidth
-              margin="normal"
+              required
             />
             <TextField
               label="Order"
-              name="order"
-              value={lectureData.order}
-              onChange={handleLectureChange}
+              variant="outlined"
               fullWidth
               margin="normal"
+              name="order"
+              type="number"
+              value={lectureData.order}
+              onChange={handleLectureChange}
+              required
             />
-            <Button type="submit" variant="contained" color="primary" style={{ marginTop: '16px' }}>
-              Add Lecture
+            <Button type="submit" variant="contained" color="primary" style={{ marginTop: "10px" }}>
+              Submit
             </Button>
           </form>
         </Box>
@@ -280,111 +377,60 @@ function Courses() {
 }
 
 function Course({ course, onEdit, onDelete, onAddLecture }) {
-  const [isMouseOver, setIsMouseOver] = useState(false);
   const navigate = useNavigate();
-  const handleView = () => {
+  const handleViewDetails = () => {
+   
     navigate(`/course-details/${course._id}`);
   };
-
   return (
-    <div style={{ margin: "10px" }}>
-      <Card
-        onMouseEnter={() => setIsMouseOver(true)}
-        onMouseLeave={() => setIsMouseOver(false)}
+    <Card sx={{ maxWidth: 345, margin: 2 }}>
+      <CardMedia
+        component="img"
+        height="140"
+        image={`http://localhost:5000/${course.imageLink}`}
+        alt={course.title}
+      />
+      <CardContent>
+        <Typography variant="h5" component="div">
+          {course.title}
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          {course.description}
+        </Typography>
+      </CardContent>
+      <Button
+        variant="outlined"
+        color="primary"
+        startIcon={<Edit />}
+        onClick={onEdit}
       >
-        <div>
-          <CardMedia
-            sx={{
-              height: 120,
-              width: 80,
-              minWidth: "100%",
-              borderRadius: "20px",
-            }}
-            image={`http://localhost:5000/uploads/${course.imageLink}`}
-            title={course.title}
-          />
-          <CardContent
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "space-between",
-            }}
-          >
-            <Typography
-              gutterBottom
-              variant="h6"
-              component="div"
-              style={{
-                fontSize: "18px",
-                fontWeight: "700",
-                color: isMouseOver && "#601b99",
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-                display: "-webkit-box",
-                "-webkit-line-clamp": 2,
-                "-webkit-box-orient": "vertical",
-              }}
-            >
-              {course.title}
-            </Typography>
-            <Typography
-              gutterBottom
-              variant="p"
-              component="div"
-              style={{
-                fontWeight: "50",
-                fontSize: "12px",
-                fontFamily: "inherit",
-                display: "-webkit-box",
-                WebkitLineClamp: 1,
-                WebkitBoxOrient: "vertical",
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-                color: isMouseOver && "#601b99",
-              }}
-            >
-              {course.description}
-            </Typography>
-            <br />
-            <div style={{ display: "flex", justifyContent: "center" }}>
-              <Button
-                variant="contained"
-                color="secondary"
-                onClick={onEdit}
-                startIcon={<Edit />}
-                size="small"
-                style={{ minWidth: "32px", height: "45px", margin: "0 5px" }}
-              />
-              <Button
-                variant="contained"
-                color="secondary"
-                onClick={onAddLecture}
-                size="small"
-                style={{ minWidth: "32px", height: "45px", margin: "0 5px" }}
-                startIcon={<Add />}
-              >
-              </Button>
-              <Button
-                variant="contained"
-                color="secondary"
-                onClick={handleView}
-                size="small"
-                style={{ minWidth: "32px", height: "45px", margin: "0 5px" }}
-                startIcon={<Visibility  />}
-              />
-              <Button
-                variant="contained"
-                color="error"
-                onClick={() => onDelete(course._id)}
-                size="small"
-                style={{ minWidth: "32px", height: "45px", margin: "0 5px" }}
-                startIcon={<Delete />}
-              />
-            </div>
-          </CardContent>
-        </div>
-      </Card>
-    </div>
+       
+      </Button>
+      <Button
+        variant="outlined"
+        color="error"
+        startIcon={<Delete />}
+        onClick={() => onDelete(course._id)}
+      >
+       
+      </Button>
+      <Button
+        variant="outlined"
+        color="secondary"
+        startIcon={<Add />}
+        onClick={onAddLecture}
+      >
+       
+      </Button>
+      <Button
+        variant="outlined"
+        color="secondary"
+        startIcon={<Visibility />}
+        onClick={handleViewDetails}
+      >
+      
+      </Button>
+    </Card>
   );
 }
 

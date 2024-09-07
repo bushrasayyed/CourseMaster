@@ -9,6 +9,7 @@ function Dashboard() {
         style={{
           marginBottom: "20px",
           fontFamily: "Kaushan Script",
+          color:"white"
         }}
       >
         Admin Dashboard
@@ -59,7 +60,7 @@ function Dashboard() {
       </Grid>
 
       <Box mt={5}>
-        <Typography variant="h5" style={{ marginBottom: "20px" }}>
+        <Typography variant="h5" style={{ marginBottom: "20px" , color:"white"}}>
           Analytics Overview
         </Typography>
 

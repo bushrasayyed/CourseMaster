@@ -1,212 +1,20 @@
-// import { Avatar, Button, IconButton, Tooltip, Typography } from "@mui/material";
-// import { useNavigate } from "react-router-dom";
-// import { useRecoilValue, useSetRecoilState } from "recoil";
-// import { isUserLoading } from "../store/selectors/isUserLoading";
-// import { userEmailState } from "../store/selectors/userEmail";
-// import { userState } from "../store/atoms/user";
-// import "/src/App.css";
-
-// function Appbar() {
-//   const navigate = useNavigate();
-//   const userLoading = useRecoilValue(isUserLoading);
-//   const userEmail = useRecoilValue(userEmailState);
-//   const setUser = useSetRecoilState(userState);
-
-//   // if (userLoading) {
-//   //   return (
-//   //     <div>
-//   //       <Loading />
-//   //     </div>
-//   //   );
-//   // }
-
-//   if (userEmail) {
-//     console.log(userEmail, "useremail");
-//     return (
-//       <div
-//         style={{
-//           display: "flex",
-//           justifyContent: "space-between",
-//           padding: 4,
-//           zIndex: 1,
-//           marginTop: "8px",
-//         }}
-//       >
-//         <div
-//           style={{
-//             display: "flex",
-//             flexDirection: "row",
-//             justifyContent: "center",
-//             alignItems: "center",
-//             marginLeft: 10,
-//             cursor: "pointer",
-//           }}
-//           onClick={() => {
-//             navigate("/");
-//           }}
-//         >
-//           <Typography
-//             style={{ color: "white", fontFamily: "Kaushan Script" }}
-//             onClick={() => {
-//               navigate("/");
-//             }}
-//             variant={"h6"}
-//           >
-//             CourseMaster
-//           </Typography>
-//         </div>
-//         <div style={{ display: "flex" }}>
-//           <div style={{ marginRight: 10, display: "flex" }}>
-//             <div style={{ marginRight: 10 }}>
-//               <button
-//                 className="button-nav"
-//                 style={{ width: "100px" }}
-//                 onClick={() => {
-//                   navigate("/addcourse");
-//                 }}
-//               >
-//                 Add Course
-//               </button>
-//             </div>
-//             <div style={{ marginRight: 10 }}>
-//               <button
-//                 className="button-nav"
-//                 style={{ width: "80px" }}
-//                 onClick={() => {
-//                   navigate("/courses");
-//                 }}
-//               >
-//                 Courses
-//               </button>
-//             </div>
-//             <div style={{ marginRight: 10 }}>
-//               <button
-//                 variant={"contained"}
-//                 className="button-btn"
-//                 style={{width:"90px",height:"35px"}}
-//                 onClick={() => {
-//                   localStorage.setItem("token", null);
-//                   localStorage.setItem("userEmail", null); // Clear userEmail as well
-//                   setUser({
-//                     isLoading: false,
-//                     userEmail: null,
-//                   });
-//                   navigate("/"); // Redirect to the home page or any desired route
-//                 }}
-//               >
-//                 Logout
-//               </button>
-//             </div>
-//             <div
-//               style={{
-//                 marginRight: "10px",
-//                 marginTop: "-5px",
-//                 marginLeft: "-5px",
-//               }}
-//             >
-//               <Tooltip
-//                 componentsProps={{
-//                   tooltip: {
-//                     sx: {
-//                       bgcolor: "common.black",
-//                       "& .MuiTooltip-arrow": {
-//                         color: "purple",
-//                       },
-//                       fontSize: "15px",
-//                       border: "2px solid #601b99",
-//                       padding: "5px",
-//                     },
-//                   },
-//                 }}
-//                 style={{ padding: "7px" }}
-//                 title={userEmail}
-//               >
-//                 <IconButton>
-//                   <Avatar
-//                     style={{
-//                       color: "purple",
-//                       backgroundColor: "whitesmoke",
-//                       width: "35px",
-//                       height: "35px",
-//                       marginLeft:"-10px"
-//                     }}
-//                     src="/broken-image.jpg"
-//                   />
-//                 </IconButton>
-//               </Tooltip>
-//             </div>
-//           </div>
-//         </div>
-//       </div>
-//     );
-//   }
-
-//   return (
-//     <div
-//       style={{
-//         display: "flex",
-//         justifyContent: "space-between",
-//         padding: "10px",
-//         zIndex: 1,
-//         marginLeft: "20px",
-//         marginRight: "20px",
-//         marginTop: "8px",
-//       }}
-//     >
-//       <div>
-//         <Typography
-//           style={{
-//             color: "white",
-//             fontFamily: "Kaushan Script",
-//             cursor: "pointer",
-//           }}
-//           onClick={() => {
-//             navigate("/");
-//           }}
-//           variant="h5"
-//         >
-//           CourseMaster
-//         </Typography>
-//       </div>
-//       <div style={{ display: "flex" }}>
-//         <div style={{ marginRight: 10 }}>
-//           <button
-//             className="button-nav"
-//             onClick={() => {
-//               navigate("/signup");
-//             }}
-//           >
-//             Signup
-//           </button>
-//         </div>
-//         <div>
-//           <button
-//             className="button-nav"
-//             onClick={() => {
-//               navigate("/signin");
-//             }}
-//           >
-//             Signin
-//           </button>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// }
-
-// export default Appbar;
-import { Avatar, IconButton, Menu, MenuItem, Tooltip, Typography } from "@mui/material";
+import { Avatar, IconButton, Menu, MenuItem, Tooltip } from "@mui/material";
+import { Person } from "@mui/icons-material"; // Import the Person icon
 import { useNavigate } from "react-router-dom";
-import { useRecoilValue, useSetRecoilState } from "recoil";
-import { useState } from "react";
-import { userEmailState } from "../store/selectors/userEmail";
-import { userState } from "../store/atoms/user";
+import { useEffect, useState } from "react";
 
 function Appbar() {
   const navigate = useNavigate();
-  const userEmail = useRecoilValue(userEmailState); // This holds the email if the user is logged in
-  const setUser = useSetRecoilState(userState);
+  const [userEmail, setUserEmail] = useState(null);
   const [anchorEl, setAnchorEl] = useState(null);
+
+  useEffect(() => {
+    // Retrieve user email from local storage
+    const storedEmail = localStorage.getItem("userEmail");
+    if (storedEmail) {
+      setUserEmail(storedEmail);
+    }
+  }, []);
 
   const handleMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
@@ -219,10 +27,7 @@ function Appbar() {
   const handleLogout = () => {
     localStorage.setItem("token", null);
     localStorage.setItem("userEmail", null);
-    setUser({
-      isLoading: false,
-      userEmail: null,
-    });
+    setUserEmail(null); // Clear email from local state
     navigate("/");
     handleMenuClose();
   };
@@ -235,43 +40,55 @@ function Appbar() {
         padding: "10px",
         zIndex: 1,
         alignItems: "center",
+        backgroundColor: "transparent", // Optional: Add a background color for better visibility
       }}
     >
-      <Typography
-        style={{ color: "white", fontFamily: "Kaushan Script", cursor: "pointer", marginLeft: "100px" }}
-        variant={"h6"}
-        onClick={() => navigate("/")}
-      >
-        CourseMaster
-      </Typography>
+      
 
-      {/* Conditionally render the avatar and menu only if userEmail exists */}
-      {userEmail && (
-        <div style={{ display: "flex", alignItems: "center" }}>
-          <>
-            <Tooltip title={userEmail} arrow>
+      <div style={{ display: "flex", alignItems: "center" }}>
+        {userEmail ? (
+         
+            <div style={{ position: "relative" }}>
               <IconButton onClick={handleMenuOpen}>
                 <Avatar
                   style={{
                     color: "purple",
                     backgroundColor: "whitesmoke",
-                    width: "35px",
-                    height: "35px",
+                    width: "40px", // Increase size if needed
+                    height: "40px", // Increase size if needed
+                    border: "2px solid purple", // Optional: Add a border for better visibility
                   }}
-                  src="/broken-image.jpg"
-                />
+                >
+                  <Person
+                    style={{
+                      position: "absolute",
+                      top: "50%",
+                      left: "50%",
+                      transform: "translate(-50%, -50%)",
+                      color: "purple", // Color of the icon
+                    }}
+                    fontSize="small" // Adjust size if needed
+                  />
+                </Avatar>
               </IconButton>
-            </Tooltip>
-            <Menu
-              anchorEl={anchorEl}
-              open={Boolean(anchorEl)}
-              onClose={handleMenuClose}
-            >
-              <MenuItem onClick={handleLogout}>Logout</MenuItem>
-            </Menu>
-          </>
-        </div>
-      )}
+              <Menu
+                anchorEl={anchorEl}
+                open={Boolean(anchorEl)}
+                onClose={handleMenuClose}
+              >
+                <MenuItem onClick={handleLogout}>Logout</MenuItem>
+              </Menu>
+            </div>
+         
+        ) : (
+          <IconButton
+            color="inherit"
+            onClick={() => navigate("/login")} // Navigate to login if no email
+          >
+            <Person style={{ color: "white" }} /> {/* Add user icon */}
+          </IconButton>
+        )}
+      </div>
     </div>
   );
 }
