@@ -27,12 +27,18 @@ function LoginPage() {
       setIsLoading(true); // Set loading to true before making the request
 
       const res = await axios.post(
-        "http://localhost:3000/users/login",
+        "http://localhost:5000/api/student/login",
         {
-          username: user.email,
+          email: user.email,
           password: user.password,
         }
       );
+
+      // Store the ID in localStorage
+      localStorage.setItem("id", res.data.userId);
+      localStorage.setItem("token", res.data.token);
+      localStorage.setItem("isLoggedIn", true);
+      localStorage.setItem("email", user.email);
 
       // Update Recoil state atomically
       set(userState, (prev) => ({
@@ -41,10 +47,6 @@ function LoginPage() {
         username: user.email.split("@")[0].toUpperCase(),
         isLoggedIn: true,
       }));
-
-      localStorage.setItem("token", res.data.token);
-      localStorage.setItem("isLoggedIn", true);
-      localStorage.setItem("email", user.email);
 
       setMessage("");
       toast.success(res.data.message);
@@ -61,12 +63,14 @@ function LoginPage() {
     // Check localStorage for previous login
     const isLoggedIn = localStorage.getItem("isLoggedIn");
     const userEmail = localStorage.getItem("email");
+    const userId = localStorage.getItem("id");
 
-    if (isLoggedIn && userEmail) {
+    if (isLoggedIn && userEmail && userId) {
       setUserRecoil({
         email: userEmail,
         username: userEmail.split("@")[0].toUpperCase(),
         isLoggedIn: true,
+        id: userId,
       });
       navigate("/courses");
     }

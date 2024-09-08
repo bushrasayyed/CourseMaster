@@ -5,10 +5,10 @@ import { RecoilRoot } from 'recoil';
 import LoginPage from './components/LoginPage';
 import RegisterPage from './components/RegisterPage';
 import ShowCourses from './components/ShowCourses';
-import Courses from './components/CoursePage';
-import PurchasedCourses from './components/Purchased';
 import Appbar from './components/Appbar';
 import backgroundImg from "/Background.svg"
+import Enroll from './components/Enroll';
+import EnrolledCourses from './components/EnrolledCourses'
 function App() {
   return (
     <RecoilRoot>
@@ -31,8 +31,9 @@ function App() {
         <Route path="/login" element= {<LoginPage />}/>
         <Route path="/register" element={<RegisterPage />} />
          <Route path ="/courses" element = {<ShowCourses />} />
-         <Route path ="/courses/:id" element ={<Courses />} />
-         <Route path ="/courses/purchased" element ={<PurchasedCourses />} />
+         <Route path ="/enroll" element = {<Enroll />} />
+         <Route path ="/enrolledCourses" element = {<EnrolledCourses />} />
+
       </Routes>
     </Router>
     </div>

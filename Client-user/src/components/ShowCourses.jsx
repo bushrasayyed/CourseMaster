@@ -1,37 +1,37 @@
 import React, { useEffect, useState } from "react";
-import { Card, Skeleton, Typography } from "@mui/material";
+import { Card, Typography, Button, Skeleton } from "@mui/material"; // Import Skeleton
 import "../index.css";
-import { atom, useRecoilState } from "recoil";
 import axios from "axios";
-import CourseCard from "./CourseCard";
 import "./courseStyle.css";
-
-const coursesState = atom({
-  key: "coursesState",
-  default: [],
-});
+import {  useNavigate } from "react-router-dom";
 
 function ShowCourses() {
-  const [courses, setCourses] = useRecoilState(coursesState);
-  const [isLoading, setIsLoading] = useState(false);
-
+  const [courses, setCourses] = useState([]);
+  const [isLoading, setIsLoading] = useState(true); // Set isLoading to true initially
+  const navigate = useNavigate();
   useEffect(() => {
-    setIsLoading(true);
-    axios
-      .get("http://localhost:3000/users/courses/", {
-        headers: {
-          Authorization: "Bearer " + localStorage.getItem("token"),
-        },
-      })
-      .then((res) => {
-        setCourses(res.data.courses);
-        setIsLoading(false);
-      })
-      .catch((err) => {
-        console.log(err);
-        setIsLoading(false);
-      });
+    const fetchCourses = async () => {
+      try {
+        const response = await axios.get("http://localhost:5000/api/getAllCourses");
+        console.log("API Response:", response);  // Log the entire response
+          setCourses(response.data);
+         
+      } catch (error) {
+        console.log("API Error:", error);  // Log any error
+        setCourses([]); // Ensure courses is set to empty array on error
+      } finally {
+        setIsLoading(false); // Set isLoading to false after data is fetched or an error occurs
+      }
+    };
+
+    fetchCourses();
   }, []);
+
+  const handleEnroll = (courseId) => {
+    // Handle enrollment logic here
+    console.log("Enroll in course with ID:", courseId);
+    navigate("/enroll", { state: { courseId } });
+    };
 
   return (
     <div>
@@ -49,16 +49,9 @@ function ShowCourses() {
       >
         All Courses
       </Typography>
-      {/* <Card
-      // style={{
-      //   margin: 10,
-      //   width: 1000,
-      //   minHeight: 100,
-      // }}
-    >     */}
       <div className="all-courses">
         {isLoading ? (
-          <div style={{ display: "flex", gap: "20px" }}>
+          <div style={{ display: "flex", gap: "20px", flexWrap: "wrap", justifyContent: "center" }}>
             <Skeleton variant="rectangular" width={345} height={400} />
             <Skeleton variant="rectangular" width={345} height={400} />
             <Skeleton variant="rectangular" width={345} height={400} />
@@ -67,17 +60,39 @@ function ShowCourses() {
           <>
             {courses.length > 0 ? (
               courses.map((course) => (
-                <CourseCard key={course._id} course={course} />
+                <Card
+                  key={course._id}
+                  style={{ margin: "10px", width: "300px", padding: "10px" }}
+                >
+                  <img
+                    src={course.imageLink || "default-image.jpg"} // Use a default image if none provided
+                    alt={course.title}
+                    style={{ width: "100%", height: "200px", objectFit: "cover" }}
+                  />
+                  <Typography variant="h6" style={{ marginTop: "10px" }}>
+                    {course.title}
+                  </Typography>
+                  <Typography variant="body2" style={{ marginTop: "5px" }}>
+                    {course.description}
+                  </Typography>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    style={{ marginTop: "10px" }}
+                    onClick={() => handleEnroll(course._id)}
+                  >
+                    ENROLL
+                  </Button>
+                </Card>
               ))
             ) : (
-              <h2 sx={{ color: "white" }}>
+              <h2 style={{ color: "white" }}>
                 "Oops! No course is currently offered. Return later!"
               </h2>
             )}
           </>
         )}
       </div>
-      {/* </Card> */}
     </div>
   );
 }
