@@ -23,9 +23,9 @@ function Signin() {
     try {
       setLoading(true); // Set loading to true during signin
       const res = await axios.post(
-        "http://localhost:3000/admin/login",
+        "http://localhost:5000/api/admin/login",
         {
-          username: email,
+          email: email,
           password: password,
         },
         {
@@ -35,12 +35,14 @@ function Signin() {
         }
       );
       const data = res.data;
+      console.log("Data",data)
 
       localStorage.setItem("token", data.token);
       setUser({
-        userEmail: email,
+        email: email,
         isLoading: false,
       });
+      // Redirect to dashboard after login
       navigate("/courses");
     } catch (error) {
       console.error("Error during signin:", error);

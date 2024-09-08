@@ -1,14 +1,39 @@
+import { useState } from "react";
 import { TextField } from "@mui/material";
 import { Card } from "@mui/material";
 import axios from "axios";
-import { useState } from "react";
 
 function Addcourse() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [image, setImage] = useState("");
+  const [image, setImage] = useState(null); // Store image file
   const [price, setPrice] = useState(0);
-  const [isMouseOver, setIsMoueOver] = useState(false);
+
+  const handleImageChange = (e) => {
+    setImage(e.target.files[0]); // Get the image file from input
+  };
+
+  const handleSubmit = async () => {
+    const formData = new FormData();
+    formData.append("title", title);
+    formData.append("description", description);
+    formData.append("price", price);
+    formData.append("courseImage", image); // Append image file to the form data
+
+    try {
+      await axios.post("http://localhost:5000/api/addcourse", formData, {
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem("token"),
+          "Content-Type": "multipart/form-data", // Set the proper content type for file upload
+        },
+      });
+
+      alert("Added course!");
+    } catch (error) {
+      console.error("Error adding course:", error);
+      alert("An error occurred while adding the course.");
+    }
+  };
 
   return (
     <div
@@ -31,17 +56,11 @@ function Addcourse() {
             flex: 1,
             flexDirection: "column",
             justifyContent: "center",
-            fontFamily: "Arial, sans-serif",
-            boxShadow: isMouseOver ? "0 0 50px #601b99" : "0 0 10px #601b99",
           }}
-          onMouseOver={() => setIsMoueOver(true)}
-          onMouseLeave={() => setIsMoueOver(false)}
         >
           <TextField
             style={{ marginBottom: 10 }}
-            onChange={(e) => {
-              setTitle(e.target.value);
-            }}
+            onChange={(e) => setTitle(e.target.value)}
             fullWidth
             label="Title"
             variant="outlined"
@@ -49,9 +68,7 @@ function Addcourse() {
           <br />
           <TextField
             style={{ marginBottom: 10 }}
-            onChange={(e) => {
-              setDescription(e.target.value);
-            }}
+            onChange={(e) => setDescription(e.target.value)}
             fullWidth
             label="Description"
             variant="outlined"
@@ -59,57 +76,17 @@ function Addcourse() {
           <br />
           <TextField
             style={{ marginBottom: 10 }}
-            onChange={(e) => {
-              setImage(e.target.value);
-            }}
-            fullWidth
-            label="Image link"
-            variant="outlined"
-          />
-          <TextField
-            style={{ marginBottom: 10 }}
-            onChange={(e) => {
-              setPrice(e.target.value);
-            }}
+            onChange={(e) => setPrice(e.target.value)}
             fullWidth
             label="Price"
             variant="outlined"
           />
-
+          <input type="file" onChange={handleImageChange} accept="image/*" />
+          <br />
           <button
             className="button-nav"
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              marginLeft: "33%",
-              width: "120px"
-            }}
-            sx={{ bgcolor: "#053B50" }}
-          
-            onClick={async () => {
-              try {
-                await axios.post(
-                  "http://localhost:3000/admin/courses",
-                  {
-                    title: title,
-                    description: description,
-                    imageLink: image,
-                    published: true,
-                    price: price,
-                  },
-                  {
-                    headers: {
-                      Authorization: "Bearer " + localStorage.getItem("token"),
-                    },
-                  }
-                );
-
-                alert("Added course!");
-              } catch (error) {
-                console.error("Error adding course:", error);
-                alert("An error occurred while adding the course.");
-              }
-            }}
+            style={{ display: "flex", justifyContent: "center", marginLeft: "33%", width: "120px" }}
+            onClick={handleSubmit}
           >
             Add Course
           </button>
@@ -118,4 +95,5 @@ function Addcourse() {
     </div>
   );
 }
+
 export default Addcourse;
