@@ -75,10 +75,10 @@ export default function Appbar() {
                 style={{ width: "150px" }}
                 className="button-nav"
                 onClick={() => {
-                  navigate("/courses/purchased");
+                  navigate("/enrolledCourses");
                 }}
               >
-                Purchased Courses
+                Enrolled Courses
               </button>
             </div>
 

@@ -11,6 +11,8 @@ import { useSetRecoilState } from "recoil";
 import { userState } from "../../src/store/atoms/user";
 
 function RegisterPage() {
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false); // Track loading state
@@ -22,10 +24,12 @@ function RegisterPage() {
       setLoading(true); // Set loading to true during signup
 
       const res = await axios.post(
-        "http://localhost:3000/users/signup",
+        "http://localhost:5000/api/student/signup",
         {
-          username: email,
-          password: password,
+          firstName,
+          lastName,
+          email,
+          password,
         }
       );
 
@@ -33,7 +37,9 @@ function RegisterPage() {
 
       // Update Recoil state with the user information
       setUser({
-        Email: email,
+        firstName: firstName,
+        lastName: lastName,
+        email: email,
         username: email.split("@")[0].toUpperCase(),
         isLoggedIn: true,
       });
@@ -43,7 +49,7 @@ function RegisterPage() {
       localStorage.setItem("isLoggedIn", true);
 
       // Navigate to the courses page
-      navigate("/courses");
+      navigate("/login");
     } catch (error) {
       console.error("Error during signup:", error);
       // Handle errors as needed
@@ -72,34 +78,46 @@ function RegisterPage() {
             fontSize: "16px",
           }}
         >
-          Welcome to CourseMaster. Signin Below..
+          Welcome to CourseMaster. Signup Below..
         </Typography>
       </div>
       <div style={{ display: "flex", justifyContent: "center" }}>
         <Card
           className="cardstyle"
           variant="outlined"
-          sx={{ width: "250px", height: "250px" }}
+          sx={{ width: "400px", padding: "30px", height: "auto" }}
         >
           <TextField
             style={{ color: "white", borderColor: "white" }}
-            onChange={(e) => {
-              setEmail(e.target.value);
-            }}
+            onChange={(e) => setFirstName(e.target.value)}
+            fullWidth
+            label="First Name"
+            variant="outlined"
+            margin="normal"
+          />
+          <TextField
+            style={{ color: "white", borderColor: "white" }}
+            onChange={(e) => setLastName(e.target.value)}
+            fullWidth
+            label="Last Name"
+            variant="outlined"
+            margin="normal"
+          />
+          <TextField
+            style={{ color: "white", borderColor: "white" }}
+            onChange={(e) => setEmail(e.target.value)}
             fullWidth
             label="Email"
             variant="outlined"
+            margin="normal"
           />
-          <br />
-          <br />
           <TextField
-            onChange={(e) => {
-              setPassword(e.target.value);
-            }}
+            onChange={(e) => setPassword(e.target.value)}
             fullWidth
             label="Password"
             variant="outlined"
             type="password"
+            margin="normal"
           />
           <br />
           <br />
@@ -112,7 +130,6 @@ function RegisterPage() {
           ) : (
             <button
               className="button-nav"
-              
               disabled={loading} // Disable button during loading
               onClick={handleSignUp}
             >

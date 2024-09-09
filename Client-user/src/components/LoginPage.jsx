@@ -1,4 +1,4 @@
-import Button from "@mui/material/Button";
+// import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import { Card, Typography, CircularProgress } from "@mui/material";
 import { useState, useEffect } from "react";
@@ -34,6 +34,12 @@ function LoginPage() {
         }
       );
 
+      // Store the ID in localStorage
+      localStorage.setItem("id", res.data.userId);
+      localStorage.setItem("token", res.data.token);
+      localStorage.setItem("isLoggedIn", true);
+      localStorage.setItem("email", user.email);
+
       // Update Recoil state atomically
       set(userState, (prev) => ({
         ...prev,
@@ -41,10 +47,6 @@ function LoginPage() {
         username: user.email.split("@")[0].toUpperCase(),
         isLoggedIn: true,
       }));
-
-      localStorage.setItem("token", res.data.token);
-      localStorage.setItem("isLoggedIn", true);
-      localStorage.setItem("email", user.email);
 
       setMessage("");
       toast.success(res.data.message);
@@ -61,12 +63,14 @@ function LoginPage() {
     // Check localStorage for previous login
     const isLoggedIn = localStorage.getItem("isLoggedIn");
     const userEmail = localStorage.getItem("email");
+    const userId = localStorage.getItem("id");
 
-    if (isLoggedIn && userEmail) {
+    if (isLoggedIn && userEmail && userId) {
       setUserRecoil({
         email: userEmail,
         username: userEmail.split("@")[0].toUpperCase(),
         isLoggedIn: true,
+        id: userId,
       });
       navigate("/courses");
     }
@@ -132,7 +136,7 @@ function LoginPage() {
               className="button-nav"
               onClick={handleLogin}
               disabled={isLoading} // Disable button while loading
-              variant="contained"
+              // variant="contained"
             >
               Signin
             </button>

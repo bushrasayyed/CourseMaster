@@ -61,7 +61,7 @@ exports.login = async (req, res) => {
       );
   
       // Send token as response
-      res.status(200).json({ message: "Login successful", token });
+      res.status(200).json({ message: "Login successful", token , userId:user._id});
     } catch (err) {
       console.error("Error:", err.message);
       res.status(500).json({ error: "Internal server error" });

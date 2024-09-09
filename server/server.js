@@ -4,6 +4,8 @@ const adminRouter = require("./routes/adminRoutes");
 const userRouter = require("./routes/userRoutes");
 const courseRouter = require("./routes/courseRoutes");
 const lectureRouter = require("./routes/lectureRoutes");
+const enrollRouter = require("./routes/enrollRoutes");
+
 require("./config/connect");
 const bodyParser = require("body-parser");
 const path = require("path");
@@ -22,5 +24,6 @@ app.use("/api", adminRouter);
 app.use("/api", userRouter);
 app.use("/api", courseRouter);
 app.use("/api", lectureRouter);
+app.use("/api", enrollRouter);
 
 app.listen(5000, () => console.log("Server running on port 5000"));
