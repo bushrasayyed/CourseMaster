@@ -10,13 +10,14 @@ function ShowCourses() {
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedCourseId, setSelectedCourseId] = useState(null);
   const [enrolledCourses, setEnrolledCourses] = useState(new Set()); // Track enrolled courses
+  const [userId, setUserId] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchCourses = async () => {
       try {
         const response = await axios.get("http://localhost:5000/api/getAllCourses");
-        console.log("Response",response)
+        console.log("Courses Response", response.data);
         setCourses(response.data);
       } catch (error) {
         console.log("API Error:", error);
@@ -26,33 +27,40 @@ function ShowCourses() {
       }
     };
 
-    // Fetch enrolled courses
-    const fetchEnrolledCourses = async () => {
-      const userId = localStorage.getItem("id");
-      if (!userId) return;
-    
+    const fetchUserData = async () => {
+      const storedUserId = localStorage.getItem("id");
+      if (!storedUserId) return;
+
+      setUserId(storedUserId);
+
+      // Fetch enrolled courses for the user
       try {
-        const response = await axios.get(`http://localhost:5000/api/enrollments?userId=${userId}`);
-        const enrolledCourseIds = response.data.map(enrollment => enrollment.courseId._id); // Adjust based on the actual response structure
-        setEnrolledCourses(new Set(enrolledCourseIds)); // Update state with enrolled course IDs
+        const token = localStorage.getItem("token");
+        const response = await axios.get(`http://localhost:5000/api/getEnrollments/${storedUserId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        const enrolledCoursesSet = new Set(response.data.map(enroll => enroll.courseId._id));
+        setEnrolledCourses(enrolledCoursesSet);
       } catch (error) {
-        console.log("Error fetching enrolled courses:", error);
+        console.error("Error fetching enrolled courses", error);
       }
     };
-    
 
     fetchCourses();
-    fetchEnrolledCourses();
+    fetchUserData();
   }, []);
 
   const handleEnroll = (courseId) => {
-    setSelectedCourseId(courseId); // Set selected course ID
-    setOpenDialog(true); // Open dialog
+    setSelectedCourseId(courseId);
+    setOpenDialog(true);
   };
 
   const handleConfirmEnrollment = async () => {
-    const userId = localStorage.getItem("id");
     const token = localStorage.getItem("token");
+    console.log("User Id", userId);
 
     if (!userId || !selectedCourseId) {
       alert("Error: Missing student ID or course ID.");
@@ -67,11 +75,13 @@ function ShowCourses() {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
         },
-        body: JSON.stringify({ userId, courseId: selectedCourseId }), // Use selectedCourseId from state
+        body: JSON.stringify({ userId, courseId: selectedCourseId }),
       });
 
       const data = await response.json();
       if (response.ok) {
+        // Update the enrolledCourses state to disable the button for the enrolled course
+        setEnrolledCourses(prev => new Set(prev).add(selectedCourseId));
         alert("Enrollment successful!");
         navigate("/enrolledCourses");
       } else {
@@ -136,7 +146,7 @@ function ShowCourses() {
                     color="primary"
                     style={{ marginTop: "10px" }}
                     onClick={() => handleEnroll(course._id)}
-                    disabled={enrolledCourses.has(course._id)} // Disable if already enrolled
+                    disabled={enrolledCourses.has(course._id)} // Disable if user is enrolled
                   >
                     {enrolledCourses.has(course._id) ? "Enrolled" : "ENROLL"}
                   </Button>

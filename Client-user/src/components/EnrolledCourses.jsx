@@ -7,19 +7,49 @@ const EnrolledCourses = () => {
   const [enrollments, setEnrollments] = useState([]);
   const navigate = useNavigate();  // Initialize useNavigate
 
+  // useEffect(() => {
+  //   // Fetch enrollments on component mount
+  //   const fetchEnrollments = async () => {
+  //     try {
+  //       const response = await axios.get('http://localhost:5000/api/enrollments');
+  //       setEnrollments(response.data);
+  //     } catch (error) {
+  //       console.error("Error fetching enrollments", error);
+  //     }
+  //   };
+    
+  //   fetchEnrollments();
+  // }, []);
+
+
   useEffect(() => {
-    // Fetch enrollments on component mount
     const fetchEnrollments = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/enrollments');
-        setEnrollments(response.data);
+        const token = localStorage.getItem('token');  // Get token from local storage
+        const userId = localStorage.getItem('id'); // Fetch userId from local storage
+  
+        if (!userId) {
+          console.error('User ID not found');
+          return;
+        }
+  
+        // Make the API call to fetch enrollments for the specific user
+        const response = await axios.get(`http://localhost:5000/api/getEnrollments/${userId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,  // Pass the token in the Authorization header
+            'x-user-id': userId  // Custom header to pass userId
+          },
+        });
+  
+        setEnrollments(response.data); // Set enrollments in state
       } catch (error) {
         console.error("Error fetching enrollments", error);
       }
     };
-    
+  
     fetchEnrollments();
   }, []);
+  
 
   // Handle navigation to lectures page
   const handleViewLectures = (courseId) => {

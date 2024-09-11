@@ -89,6 +89,7 @@ export default function Appbar() {
                 className="button-btn"
                 onClick={() => {
                   localStorage.removeItem("token");
+                  localStorage.removeItem("id");
                   localStorage.removeItem("isLoggedIn");
                   localStorage.removeItem("email");
                   setUser({
