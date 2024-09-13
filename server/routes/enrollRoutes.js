@@ -9,7 +9,7 @@ const {
   } = require("../controller/enrollController");
 router.post('/createEnrollment', createEnrollment);
 router.get('/enrollments', getAllEnrollments);
-router.get('/getEnrollments/:id',getEnrollmentById);
+router.get('/getEnrollments/:userId',getEnrollmentById);
 router.put('/updateEnrollments/:id',updateEnrollment);
 router.delete('/deleteEnrollments/:id',deleteEnrollment);
 

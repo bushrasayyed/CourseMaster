@@ -2,7 +2,6 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const EnrollmentSchema = new Schema({
-
   userId: {
     type: Schema.Types.ObjectId,  // Reference to User
     ref: 'User',
@@ -25,11 +24,9 @@ const EnrollmentSchema = new Schema({
     type: Date,  // Date when the course was completed
     default: null,
   },
+}, {
+  timestamps: true,
 });
 
-// Optional: Add indexing for faster querying
-// EnrollmentSchema.index({ userId: 1, courseId: 2 }, { unique: true });
-
-const Enrollment = mongoose.model('Enroll', EnrollmentSchema);
-
+const Enrollment = mongoose.model('Enrollment', EnrollmentSchema);
 module.exports = Enrollment;

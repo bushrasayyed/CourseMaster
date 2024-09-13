@@ -19,29 +19,41 @@ const Enroll = require('../models/Enroll');  // Adjust the path as necessary
 //     res.status(500).json({ message: 'Error creating enrollment', error });
 //   }
 // };
+
 exports.createEnrollment = async (req, res) => {
   const { userId, courseId } = req.body;
-  try {
-    // Check if enrollment already exists
-    const existingEnrollment = await Enroll.findOne({ userId, courseId });
+ 
 
+  try {
+    // Check if enrollment already exists for the user and course
+    const existingEnrollment = await Enroll.findOne({ userId, courseId });
     if (existingEnrollment) {
       return res.status(400).json({ message: 'Already enrolled in this course.' });
     }
 
-    // Create new enrollment
-    const newEnrollment = new Enroll({ userId, courseId });
+    // Create new enrollment with default values for progress, is_completed, and completed_at
+    const newEnrollment = new Enroll({
+      userId,
+      courseId,
+      progress: 0,         // Initial progress is 0
+      is_completed: false,  // Course is not completed initially
+      completed_at: null,   // No completion date initially
+    });
+
+    // Save the new enrollment to the database
     await newEnrollment.save();
 
-    res.status(201).json({ message: 'Enrollment successful!', enrollment: newEnrollment });
+    res.status(201).json({
+      message: 'Enrollment successful!',
+      enrollment: newEnrollment,
+    });
   } catch (error) {
     console.error('Error creating enrollment:', error);
-    if (error.code === 11000) { // Duplicate key error
-      return res.status(400).json({ message: 'Duplicate enrollment detected.' });
-    }
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Server error', error });
   }
 };
+
+
 
 
 
@@ -60,15 +72,16 @@ exports.getAllEnrollments = async (req, res) => {
 
 
 // Endpoint to get all enrollments for a specific user
+
 exports.getEnrollmentById = async (req, res) => {
   try {
-    const { userId } = req.query; // Get userId from query parameter
+    const userId = req.params.userId; // Get userId from URL parameter
 
     if (!userId) {
       return res.status(400).json({ message: 'User ID is required' });
     }
 
-    const enrollments = await Enroll.find({ userId: userId }).populate('courseId');
+    const enrollments = await Enroll.find({ userId }).populate('courseId');
 
     if (!enrollments.length) {
       return res.status(404).json({ message: 'No enrollments found' });
@@ -79,6 +92,7 @@ exports.getEnrollmentById = async (req, res) => {
     res.status(500).json({ message: 'Error fetching enrollments', error });
   }
 };
+
 
 
 // Update an enrollment
