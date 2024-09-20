@@ -168,17 +168,20 @@
 // export default App;
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 // import Appbar from "./components/Appbar";
-import Courses from "./components/Courses";
-import CourseDetails from "./components/CourseDetails";
-import Addcourse from "./components/Addcourse";
-import Signin from "./components/Signin";
-import Signup from "./components/Signup";
+import Courses from "./components/courses/Courses";
+import CourseDetails from "./components/courses/CourseDetails";
+import Addcourse from "./components/courses/Addcourse";
+import Signin from "./components/auth/Signin";
+import Signup from "./components/auth/Signup";
 import Landing from "./components/Landing";
 import { RecoilRoot } from "recoil";
-import "./components/LandingPage.css";
+import "./assets/LandingPage.css";
 import backgroundImg from "../public/Background.svg";
-import Layout from "./components/Layout";
+import Layout from "./components/common/Layout";
 import Dashboard from "./components/Dashboard";
+import Exam from "./components/exams/Exam";
+import QuestionsPage from "./components/exams/QuestionsPage";
+
 
 function App() {
   return (
@@ -203,8 +206,11 @@ function App() {
             <Route path="/courses" element={<Layout><Courses /></Layout>} />
             <Route path="/course-details/:courseId" element={<Layout><CourseDetails /></Layout>} />
             <Route path="/addcourse" element={<Layout><Addcourse /></Layout>} />
+            <Route path="/exams" element={<Layout><Exam /></Layout>} />
             <Route path="/signin" element={<Signin />} />
             <Route path="/signup" element={<Signup />} />
+            <Route path="/questions/:examId" element={<Layout><QuestionsPage /></Layout>} />
+            
           </Routes>
         </Router>
       </div>

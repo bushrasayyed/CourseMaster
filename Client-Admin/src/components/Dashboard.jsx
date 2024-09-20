@@ -1,7 +1,29 @@
 import { Card, Typography, Grid, Box } from "@mui/material";
-import React from "react";
+import React, { useEffect, useState } from "react";
+import axios from "axios"; // Import axios for API calls
 
 function Dashboard() {
+  // State to store counts
+  const [stats, setStats] = useState({
+    totalCourses: 0,
+    totalExams: 0,
+    totalStudents: 0
+  });
+
+  // Fetch stats data from the backend when the component mounts
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const response = await axios.get("http://localhost:5000/api/getCounts"); // Adjust API route if necessary
+        setStats(response.data);
+      } catch (error) {
+        console.error("Error fetching statistics:", error);
+      }
+    };
+
+    fetchStats();
+  }, []);
+
   return (
     <div style={{ padding: "20px" }}>
       <Typography
@@ -9,7 +31,7 @@ function Dashboard() {
         style={{
           marginBottom: "20px",
           fontFamily: "Kaushan Script",
-          color:"white"
+          color: "white"
         }}
       >
         Admin Dashboard
@@ -22,11 +44,11 @@ function Dashboard() {
             style={{
               padding: "20px",
               textAlign: "center",
-              backgroundColor: "#f0f0f0",
+              backgroundColor: "#f0f0f0"
             }}
           >
             <Typography variant="h6">Total Courses</Typography>
-            <Typography variant="h4">10</Typography>
+            <Typography variant="h4">{stats.totalCourses}</Typography>
           </Card>
         </Grid>
 
@@ -36,11 +58,11 @@ function Dashboard() {
             style={{
               padding: "20px",
               textAlign: "center",
-              backgroundColor: "#f0f0f0",
+              backgroundColor: "#f0f0f0"
             }}
           >
             <Typography variant="h6">Total Exams</Typography>
-            <Typography variant="h4">15</Typography>
+            <Typography variant="h4">{stats.totalExams}</Typography>
           </Card>
         </Grid>
 
@@ -50,17 +72,20 @@ function Dashboard() {
             style={{
               padding: "20px",
               textAlign: "center",
-              backgroundColor: "#f0f0f0",
+              backgroundColor: "#f0f0f0"
             }}
           >
             <Typography variant="h6">Total Students</Typography>
-            <Typography variant="h4">200</Typography>
+            <Typography variant="h4">{stats.totalUsers}</Typography>
           </Card>
         </Grid>
       </Grid>
 
       <Box mt={5}>
-        <Typography variant="h5" style={{ marginBottom: "20px" , color:"white"}}>
+        <Typography
+          variant="h5"
+          style={{ marginBottom: "20px", color: "white" }}
+        >
           Analytics Overview
         </Typography>
 
@@ -72,7 +97,7 @@ function Dashboard() {
               height: "200px",
               backgroundColor: "#ddd",
               textAlign: "center",
-              lineHeight: "200px",
+              lineHeight: "200px"
             }}
           >
             Course Enrollments Graph
@@ -83,7 +108,7 @@ function Dashboard() {
               height: "200px",
               backgroundColor: "#ddd",
               textAlign: "center",
-              lineHeight: "200px",
+              lineHeight: "200px"
             }}
           >
             Exam Performance Graph
@@ -94,7 +119,7 @@ function Dashboard() {
               height: "200px",
               backgroundColor: "#ddd",
               textAlign: "center",
-              lineHeight: "200px",
+              lineHeight: "200px"
             }}
           >
             Student Growth Graph
